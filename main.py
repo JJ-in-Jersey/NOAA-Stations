@@ -11,6 +11,8 @@ profile_lookup = {'darwin': 'HOME', 'win32': 'USERPROFILE'}
 
 if __name__ == '__main__':
 
+    print(f'\nProcessing current stations')
+
     east_coast_current_stations = 'https://tidesandcurrents.noaa.gov/noaacurrents/Stations?g=444'
     current_waypoints = Path(str(os.environ[profile_lookup[platform]]) + '/Developer Workspace/GPX/NOAA Current Stations/')
     os.makedirs(current_waypoints, exist_ok=True)
@@ -21,6 +23,8 @@ if __name__ == '__main__':
         if 'Predictions?' in str(tag.get('href')):
             wp = CurrentWaypoint(tag)
             wp.write_me(current_waypoints)
+
+    print(f'\nProcessing tide stations')
 
     east_coast_tide_stations_url = 'https://tidesandcurrents.noaa.gov/tide_predictions.html?gid=1746#listing'
     tide_waypoints = Path(str(os.environ[profile_lookup[platform]]) + '/Developer Workspace/GPX/NOAA Tide Stations/')
