@@ -56,7 +56,7 @@ if __name__ == '__main__':
     brooklyn_bridge_coords = "40.706, -73.9977"
 
     for year in range(start_year, start_year+3):
-        frame = pd.DataFrame(columns=['start_date', 'phase'])
+        frame = pd.DataFrame(columns=['start_date', 'name'])
         date = datetime.datetime(year, 1, 1)
         sun_moon_folder = Path(str(os.environ[profile_lookup[platform]]) + '/Developer Workspace/ER_' + str(year) + '/Transit Times')
         filepath = sun_moon_folder.joinpath('sun_moon.csv')
