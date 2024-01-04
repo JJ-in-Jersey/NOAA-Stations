@@ -68,6 +68,7 @@ if __name__ == '__main__':
             sun_moon_request = requests.get(sun_moon_url)
             data = json.loads(sun_moon_request.text)
             frame.loc[len(frame)] = [str(date.date()), data['properties']['data']['curphase']]
-            print(str(date.date()), data['properties']['data']['curphase'])
+            print(str(date.date().month))
             date = date + datetime.timedelta(days=1)
-            frame.to_csv(sun_moon_folder.joinpath(sun_moon_file), index=False)
+
+        frame.to_csv(sun_moon_folder.joinpath(sun_moon_file), index=False)
