@@ -51,23 +51,23 @@ if __name__ == '__main__':
 
     # ---------- Moon Phases ----------
     # https://aa.usno.navy.mil/data/api#rstt documentation
-    print('\nProcessing sun moon data')
+    print('\nProcessing sun moon data for East River')
     frame = pd.DataFrame(columns=['date', 'phase'])
     start_year = 2023
     brooklyn_bridge_coords = "40.706, -73.9977"
-    date = datetime.datetime(start_year, 1, 1)
-    print(date)
-    sun_moon_folder = Path(str(os.environ[profile_lookup[platform]]) + '/Developer Workspace/GPX/Sun Moon/')
+    sun_moon_folder = Path(str(os.environ[profile_lookup[platform]]) + '/Developer Workspace/ER_' + str(start_year) + '/Transit Time')
     sun_moon_file = 'sun_moon.csv'
     os.makedirs(sun_moon_folder, exist_ok=True)
 
-    while date.year < start_year + 3:
-        sun_moon_url = "https://aa.usno.navy.mil/api/rstt/oneday?date=" + str(date.date()) + "&coords=" + brooklyn_bridge_coords
-        sun_moon_request = requests.get(sun_moon_url)
-        data = json.loads(sun_moon_request.text)
-        frame.loc[len(frame)] = [str(date.date()), data['properties']['data']['curphase']]
-        print(str(date.date()), data['properties']['data']['curphase'])
-        date = date + datetime.timedelta(days=1)
-        frame.to_csv(sun_moon_folder.joinpath(sun_moon_file))
+    for year in range(start_year, start_year+4):
+        date = datetime.datetime(year, 1, 1)
+        print(year, date.year, date)
 
-
+        while date.year < start_year + 1:
+            sun_moon_url = "https://aa.usno.navy.mil/api/rstt/oneday?date=" + str(date.date()) + "&coords=" + brooklyn_bridge_coords
+            sun_moon_request = requests.get(sun_moon_url)
+            data = json.loads(sun_moon_request.text)
+            frame.loc[len(frame)] = [str(date.date()), data['properties']['data']['curphase']]
+            print(str(date.date()), data['properties']['data']['curphase'])
+            date = date + datetime.timedelta(days=1)
+            frame.to_csv(sun_moon_folder.joinpath(sun_moon_file), index=False)
