@@ -21,33 +21,33 @@ if __name__ == '__main__':
     if chrome_driver.latest_stable_version > chrome_driver.installed_driver_version:
         chrome_driver.install_stable_driver()
 
-    # print(f'\nProcessing current stations')
-    #
-    # east_coast_current_stations = 'https://tidesandcurrents.noaa.gov/noaacurrents/Stations?g=444'
-    # current_waypoints = Path(str(os.environ[profile_lookup[platform]]) + '/Developer Workspace/GPX/NOAA Current Stations/')
-    # os.makedirs(current_waypoints, exist_ok=True)
-    # current_request = requests.get(east_coast_current_stations)
-    #
-    # tree = Soup(current_request.text, 'html.parser')
-    # for tag in tree.find_all('a'):
-    #     if 'Predictions?' in str(tag.get('href')):
-    #         wp = CurrentWaypoint(tag)
-    #         wp.write_me(current_waypoints)
-    #
-    # print(f'\nProcessing tide stations')
-    #
-    # east_coast_tide_stations_url = 'https://tidesandcurrents.noaa.gov/tide_predictions.html?gid=1746#listing'
-    # tide_waypoints = Path(str(os.environ[profile_lookup[platform]]) + '/Developer Workspace/GPX/NOAA Tide Stations/')
-    # os.makedirs(tide_waypoints, exist_ok=True)
-    # chrome_driver.set_driver()
-    # tide_source = chrome_driver.page_source(east_coast_tide_stations_url)
-    #
-    # tree = Soup(tide_source, 'html.parser')
-    # for tag in tree.find_all('a'):
-    #     if 'noaatidepredictions.html?' in str(tag):
-    #         row_list = [str(d.text).strip() for d in tag.find_parent('tr').children]
-    #         wp = TideWaypoint(row_list)
-    #         wp.write_me(tide_waypoints)
+    print(f'\nProcessing current stations')
+
+    east_coast_current_stations = 'https://tidesandcurrents.noaa.gov/noaacurrents/Stations?g=444'
+    current_waypoints = Path(str(os.environ[profile_lookup[platform]]) + '/Developer Workspace/GPX/NOAA Current Stations/')
+    os.makedirs(current_waypoints, exist_ok=True)
+    current_request = requests.get(east_coast_current_stations)
+
+    tree = Soup(current_request.text, 'html.parser')
+    for tag in tree.find_all('a'):
+        if 'Predictions?' in str(tag.get('href')):
+            wp = CurrentWaypoint(tag)
+            wp.write_me(current_waypoints)
+
+    print(f'\nProcessing tide stations')
+
+    east_coast_tide_stations_url = 'https://tidesandcurrents.noaa.gov/tide_predictions.html?gid=1746#listing'
+    tide_waypoints = Path(str(os.environ[profile_lookup[platform]]) + '/Developer Workspace/GPX/NOAA Tide Stations/')
+    os.makedirs(tide_waypoints, exist_ok=True)
+    chrome_driver.set_driver()
+    tide_source = chrome_driver.page_source(east_coast_tide_stations_url)
+
+    tree = Soup(tide_source, 'html.parser')
+    for tag in tree.find_all('a'):
+        if 'noaatidepredictions.html?' in str(tag):
+            row_list = [str(d.text).strip() for d in tag.find_parent('tr').children]
+            wp = TideWaypoint(row_list)
+            wp.write_me(tide_waypoints)
 
     # ---------- Moon Phases ----------
     # https://aa.usno.navy.mil/data/api#rstt documentation
