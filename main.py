@@ -64,13 +64,15 @@ if __name__ == '__main__':
         print(f'     Processing {filepath}')
 
         while date.year < year + 1:
+            sun_moon_request = None
             sun_moon_url = "https://aa.usno.navy.mil/api/rstt/oneday?date=" + str(date.date()) + "&coords=" + brooklyn_bridge_coords
             try:
                 sun_moon_request = requests.get(sun_moon_url)
-            except:
+            except requests.Timeout:
                 try:
                     sun_moon_request = requests.get(sun_moon_url)
-                except:
+                except requests.Timeout:
+                    print(f'requests Timeout err, 2nd try')
                     pass
             data = json.loads(sun_moon_request.text)
             phase = data['properties']['data']['curphase']
