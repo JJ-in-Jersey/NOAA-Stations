@@ -52,36 +52,79 @@ if __name__ == '__main__':
     # ---------- Moon Phases ----------
     # https://aa.usno.navy.mil/data/api#rstt documentation
     print('\nProcessing sun moon data for East River')
-    start_year = 2023
+    frame = pd.DataFrame(columns=['start_date', 'phase', 'fracillum', 'name'])
     brooklyn_bridge_coords = "40.706, -73.9977"
+    sun_moon_folder = Path(str(os.environ[profile_lookup[platform]]) + '/Developer Workspace')
+    filepath = sun_moon_folder.joinpath('sun_moon.csv')
+    os.makedirs(sun_moon_folder, exist_ok=True)
+    print(f'     Processing {filepath}')
 
-    for year in range(start_year, start_year+3):
-        frame = pd.DataFrame(columns=['start_date', 'phase', 'fracillum', 'name'])
-        date = datetime.datetime(year, 1, 1)
-        sun_moon_folder = Path(str(os.environ[profile_lookup[platform]]) + '/Developer Workspace/ER_' + str(year) + '/Transit Times')
-        filepath = sun_moon_folder.joinpath('sun_moon.csv')
-        os.makedirs(sun_moon_folder, exist_ok=True)
-        print(f'     Processing {filepath}')
+    cal_year = 2024
 
-        while date.year < year + 1:
-            sun_moon_request = None
-            sun_moon_url = "https://aa.usno.navy.mil/api/rstt/oneday?date=" + str(date.date()) + "&coords=" + brooklyn_bridge_coords
+    day = datetime.datetime(cal_year - 1, 12, 1)
+    while day.year == cal_year - 1:
+        sun_moon_request = None
+        sun_moon_url = "https://aa.usno.navy.mil/api/rstt/oneday?date=" + str(day.date()) + "&coords=" + brooklyn_bridge_coords
+        try:
+            sun_moon_request = requests.get(sun_moon_url)
+        except requests.Timeout:
             try:
                 sun_moon_request = requests.get(sun_moon_url)
             except requests.Timeout:
-                try:
-                    sun_moon_request = requests.get(sun_moon_url)
-                except requests.Timeout:
-                    print(f'requests Timeout err, 2nd try')
-                    pass
-            data = json.loads(sun_moon_request.text)
-            phase = data['properties']['data']['curphase']
-            fracillum = data['properties']['data']['fracillum']
-            phase_num = round(int(fracillum[:-1])/11.11)
-            phase_num = phase_num * -1 if "Waning" in phase and not phase_num == 9 else phase_num
-            name = 'moon ' + str(phase_num)
-            print(date, phase, fracillum, name)
-            frame.loc[len(frame)] = [str(date.date()), phase, fracillum, name]
-            date = date + datetime.timedelta(days=1)
+                print(f'requests Timeout err, 2nd try')
+
+        data = json.loads(sun_moon_request.text)
+        phase = data['properties']['data']['curphase']
+        fracillum = data['properties']['data']['fracillum']
+        phase_num = round(int(fracillum[:-1])/11.11)
+        phase_num = phase_num * -1 if "Waning" in phase and not phase_num == 9 else phase_num
+        name = 'moon ' + str(phase_num)
+        print(day, phase, fracillum, name)
+        frame.loc[len(frame)] = [str(day.date()), phase, fracillum, name]
+        day = day + datetime.timedelta(days=1)
+
+    day = datetime.datetime(cal_year, 1, 1)
+    while day.year == cal_year:
+        sun_moon_request = None
+        sun_moon_url = "https://aa.usno.navy.mil/api/rstt/oneday?date=" + str(day.date()) + "&coords=" + brooklyn_bridge_coords
+        try:
+            sun_moon_request = requests.get(sun_moon_url)
+        except requests.Timeout:
+            try:
+                sun_moon_request = requests.get(sun_moon_url)
+            except requests.Timeout:
+                print(f'requests Timeout err, 2nd try')
+
+        data = json.loads(sun_moon_request.text)
+        phase = data['properties']['data']['curphase']
+        fracillum = data['properties']['data']['fracillum']
+        phase_num = round(int(fracillum[:-1]) / 11.11)
+        phase_num = phase_num * -1 if "Waning" in phase and not phase_num == 9 else phase_num
+        name = 'moon ' + str(phase_num)
+        print(day, phase, fracillum, name)
+        frame.loc[len(frame)] = [str(day.date()), phase, fracillum, name]
+        day = day + datetime.timedelta(days=1)
+
+    day = datetime.datetime(cal_year + 1, 1, 1)
+    while day.month == 1:
+        sun_moon_request = None
+        sun_moon_url = "https://aa.usno.navy.mil/api/rstt/oneday?date=" + str(day.date()) + "&coords=" + brooklyn_bridge_coords
+        try:
+            sun_moon_request = requests.get(sun_moon_url)
+        except requests.Timeout:
+            try:
+                sun_moon_request = requests.get(sun_moon_url)
+            except requests.Timeout:
+                print(f'requests Timeout err, 2nd try')
+
+        data = json.loads(sun_moon_request.text)
+        phase = data['properties']['data']['curphase']
+        fracillum = data['properties']['data']['fracillum']
+        phase_num = round(int(fracillum[:-1]) / 11.11)
+        phase_num = phase_num * -1 if "Waning" in phase and not phase_num == 9 else phase_num
+        name = 'moon ' + str(phase_num)
+        print(day, phase, fracillum, name)
+        frame.loc[len(frame)] = [str(day.date()), phase, fracillum, name]
+        day = day + datetime.timedelta(days=1)
 
         frame.to_csv(filepath, index=False)
